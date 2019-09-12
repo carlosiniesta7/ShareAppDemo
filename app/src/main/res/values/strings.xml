@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ShareAppDemo</string>
+    <string name="share">Share</string>
+    <string name="shareText">Share Text!</string>
+    <string name="imageToShare">Imagen para compartir</string>
+    <string name="shareImage">Share Image!</string>
+</resources>
