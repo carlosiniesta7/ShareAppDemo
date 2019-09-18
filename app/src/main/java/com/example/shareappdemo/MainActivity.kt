@@ -1,132 +1,111 @@
 package com.example.shareappdemo
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.view.View
-import androidx.core.content.FileProvider
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.*
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.common.api.ApiException
 
+
+
+const val RC_SIGN_IN: Int = 17
+
+@Suppress("DEPRECATED_IDENTITY_EQUALS")
 class MainActivity : AppCompatActivity() {
+
+    private var callbackManager: CallbackManager? = null
+    var mGoogleSignInClient :GoogleSignInClient? = null
+
+    var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .build()
+
 
     @SuppressLint("SetWorldReadable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        shareTextButton.setOnClickListener {
-            val shareText = editText.text.toString()
-
-            val intentShareText = Intent()
-            intentShareText.action = Intent.ACTION_SEND
-            intentShareText.type = "text/plain"
-            intentShareText.putExtra(Intent.EXTRA_TEXT, shareText)
-            intentShareText.putExtra(Intent.EXTRA_SUBJECT, "SUBJECT HERE")
-            startActivity(Intent.createChooser(intentShareText,"Share Text via" ))
+        fb_login_button.setOnClickListener {
+            signInFacebook()
         }
 
-        shareImageButton.setOnClickListener{
-            //val myDrawable = imageView.drawable
-            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.tetrix)
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-            // Save the bitmap to internal storage and get uri
-            //val uri = bitmap.saveToInternalStorage(this)
+        gl_login_button.setOnClickListener {
+            signInGoogle()
+        }
 
-            // Finally, share the internal storage saved bitmap
-            //this.shareCacheDirBitmap(uri)
+    }
 
+    private fun signInGoogle() {
+        val signInIntent = mGoogleSignInClient?.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
 
-            // getExternalFilesDir() + "/Pictures" should match the declaration in fileprovider.xml paths
-            // val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "splash.png")
-            val file = File(externalCacheDir, "splash.png")
+    // -------------- SIGN IN FACEBOOK FUNCTION ----------
 
-            // wrap File object into a content provider. NOTE: authority here should match authority in manifest declaration
-            val bmpUri = FileProvider.getUriForFile(this, "com.example.shareappdemo.fileprovider", file)
+    private fun signInFacebook() {
+        fb_login_button.setReadPermissions("email")
+        callbackManager = CallbackManager.Factory.create()
 
-            val fOut = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut)
-            fOut.flush()
-            fOut.close()
-            file.setReadable(true, false)
-            val shareImageIntent = Intent(Intent.ACTION_SEND)
-            shareImageIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            shareImageIntent.putExtra(Intent.EXTRA_STREAM, bmpUri)
-            shareImageIntent.type = "image/png"
-            shareImageIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here")
-            startActivity(Intent.createChooser(shareImageIntent,"Share Image via" ))
+        LoginManager.getInstance()
+            .registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
+                    Log.d("MainActivity", "Facebook token:" + loginResult.accessToken.token)
+                    Toast.makeText(applicationContext, loginResult.toString(), Toast.LENGTH_LONG).show()
+                    startActivity(Intent(applicationContext, SecondActivity::class.java))
+                }
+
+                override fun onCancel() {
+                    Log.d("MainActivity", "Facebook Canceled")
+                }
+
+                override fun onError(exception: FacebookException) {
+                    Log.d("MainActivity", "Facebook Error")
+                }
+            })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager?.onActivityResult(requestCode, resultCode, data)
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
         }
     }
-}
 
-private fun MainActivity.shareCacheDirBitmap(uri: Uri) {
-    val fis = FileInputStream(uri.path)  // 2nd line
-    val bitmap = BitmapFactory.decodeStream(fis)
-    fis.close()
+    private fun handleSignInResult(completedTask: com.google.android.gms.tasks.Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
 
-    try {
-        val file = File("${this.cacheDir}/drawing.png")
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(file))
-        val contentUri = FileProvider.getUriForFile(this, this.packageName + ".provider", file)
+            Toast.makeText(this, account?.displayName.toString(), Toast.LENGTH_LONG).show()
+            // Signed in successfully, show authenticated UI.
+            startActivity(Intent(applicationContext, SecondActivity::class.java))
 
-        val shareIntent = Intent()
-        shareIntent.action = Intent.ACTION_SEND
-        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-        shareIntent.type = "image/*"
-        this.startActivity(Intent.createChooser(shareIntent, "Share Image"))
-    } catch (e: FileNotFoundException) {
-        e.printStackTrace()
+        } catch (e: ApiException) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            //Log.w(FragmentActivity.TG, "signInResult:failed code=" + e.statusCode)
+            ///updateUI(null)
+            Toast.makeText(this, "FAILED", Toast.LENGTH_LONG).show()
+        }
+
     }
-}
-
-val View.bitmap: Bitmap
-    get() {
-        // Screenshot taken for the specified root view and its child elements.
-        val bitmap = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        this.draw(canvas)
-        return bitmap
-    }
-
-private fun Bitmap.saveToInternalStorage(context: Context): Uri {
-    // Get the context wrapper instance
-    val wrapper = ContextWrapper(context)
-
-    // Initializing a new file
-    // The bellow line return a directory in internal storage
-    var file = wrapper.getDir("images", Context.MODE_PRIVATE)
-
-
-    // Create a file to save the image, random file name
-    //file = File(file, "${UUID.randomUUID()}.png")
-
-    file = File(file, "image.png")
-
-    try {
-        // Get the file output stream
-        val stream: OutputStream = FileOutputStream(file)
-
-        // Compress bitmap
-        this.compress(Bitmap.CompressFormat.PNG, 100, stream)
-
-        // Flush the stream
-        stream.flush()
-
-        // Close stream
-        stream.close()
-    } catch (e: IOException){ // Catch the exception
-        e.printStackTrace()
-    }
-
-    // Return the saved image uri
-    return Uri.parse(file.absolutePath)
 }

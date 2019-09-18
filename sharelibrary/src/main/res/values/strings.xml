@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ShareLibrary</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="gToF">Convierte de Grados a Fahrenheit</string>
+    <string name="convert">Convertir</string>
+    <string name="introduce">Introduce Temperatura</string>
+</resources>

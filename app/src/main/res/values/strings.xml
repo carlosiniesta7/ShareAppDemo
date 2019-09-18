@@ -4,4 +4,7 @@
     <string name="shareText">Share Text!</string>
     <string name="imageToShare">Imagen para compartir</string>
     <string name="shareImage">Share Image!</string>
+    <string name="facebook_app_id">2823539054341744</string>
+    <string name="fb_login_protocol_scheme">fb2823539054341744</string>
+
 </resources>

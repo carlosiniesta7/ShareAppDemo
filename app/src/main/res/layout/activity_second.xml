@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:paddingLeft="@dimen/margin"
+        android:layout_marginLeft="@dimen/margin"
+        android:paddingRight="@dimen/margin"
+        android:layout_marginRight="@dimen/margin"
+        android:layout_marginTop="40dp"
+        android:text="Hello World!" />
+
+    <Button
+        android:id="@+id/shareTextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/shareText" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="300dp"
+        android:src="@drawable/tetrix"
+        android:layout_marginTop="40dp"
+        android:contentDescription="@string/imageToShare" />
+
+    <Button
+        android:id="@+id/shareImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/shareImage" />
+
+</LinearLayout>
