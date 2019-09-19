@@ -41,7 +41,6 @@ class SecondActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(intentShareText, "Share Text via"))
     }
 
-    @SuppressLint("SetWorldReadable")
     private fun shareImageFun(
         file: File,
         bitmap: Bitmap,
@@ -53,7 +52,6 @@ class SecondActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut)
         fOut.flush()
         fOut.close()
-        file.setReadable(true, false)
 
         shareImageIntent.action = Intent.ACTION_SEND
         shareImageIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

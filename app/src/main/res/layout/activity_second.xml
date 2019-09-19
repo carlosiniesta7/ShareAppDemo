@@ -15,7 +15,10 @@
         android:paddingRight="@dimen/margin"
         android:layout_marginRight="@dimen/margin"
         android:layout_marginTop="40dp"
-        android:text="Hello World!" />
+        android:text="@string/Hello"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        tools:ignore="LabelFor" />
 
     <Button
         android:id="@+id/shareTextButton"

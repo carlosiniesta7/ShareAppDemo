@@ -6,5 +6,7 @@
     <string name="shareImage">Share Image!</string>
     <string name="facebook_app_id">2823539054341744</string>
     <string name="fb_login_protocol_scheme">fb2823539054341744</string>
+    <string name="gl_logout">Salir</string>
+    <string name="Hello">Hello World!</string>
 
 </resources>

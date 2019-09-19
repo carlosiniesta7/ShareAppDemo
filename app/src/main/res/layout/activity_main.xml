@@ -19,7 +19,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:visibility="visible"
         android:layout_marginTop="20dp"
         />
+
+    <Button
+        android:id="@+id/gl_logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gl_logout"
+        android:layout_gravity="center"
+        android:background="@color/cardview_light_background"
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        android:drawableLeft="@drawable/common_google_signin_btn_icon_light"
+        android:drawableStart="@drawable/common_google_signin_btn_icon_light" />
 
 </LinearLayout>
